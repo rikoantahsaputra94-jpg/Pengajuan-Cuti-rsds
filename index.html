@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pengajuan Cuti RSDS</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
+<style>
+body{background:linear-gradient(180deg,#e0f2fe,#f8fafc)}
+.card{background:#fff;border-radius:28px;box-shadow:0 30px 60px rgba(15,23,42,.12)}
+.input{width:100%;padding:14px 16px;border-radius:16px;border:1px solid #cbd5e1;font-size:15px}
+.input:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 4px rgba(14,165,233,.25)}
+.ac{position:absolute;z-index:50;background:#fff;border-radius:18px;border:1px solid #e2e8f0;max-height:260px;overflow:auto;width:100%;box-shadow:0 18px 40px rgba(0,0,0,.15)}
+.ac-item{padding:14px 18px;display:flex;justify-content:space-between;cursor:pointer}
+.ac-item:hover{background:#e0f2fe}
+.req-card{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:18px;padding:16px}
+canvas{touch-action:none}
+.divider{height:1px;background:linear-gradient(to right,transparent,#cbd5e1,transparent);margin:24px 0}
+</style>
+</head>
+
+<body class="min-h-screen flex justify-center p-6">
+<main class="card w-full max-w-2xl p-8">
+
+<header class="mb-8">
+<h1 class="text-3xl font-bold text-sky-700">Pengajuan Cuti</h1>
+<p class="text-sm text-slate-500">RSUD dr. Soedarso</p>
+</header>
+
+<section class="space-y-4">
+
+<div>
+<label class="font-semibold text-sm">Nama Pegawai</label>
+<div class="relative">
+<input id="nama" class="input" placeholder="Ketik minimal 2 huruf" autocomplete="off">
+<div id="acBox" class="ac hidden"></div>
+</div>
+</div>
+
+<div>
+<label class="font-semibold text-sm">NIP</label>
+<input id="nip" class="input bg-slate-100" readonly>
+</div>
+
+<div>
+<label class="font-semibold text-sm">Jabatan</label>
+<input id="jabatan" class="input bg-slate-100" readonly>
+</div>
+
+<div>
+<label class="font-semibold text-sm">No HP</label>
+<input id="hp" class="input">
+</div>
+
+<div>
+<label class="font-semibold text-sm">Jenis Cuti</label>
+<select id="jenis" class="input">
+<option value="">-- Pilih Jenis Cuti --</option>
+<option value="TAHUNAN">Cuti Tahunan</option>
+<option value="SAKIT">Cuti Sakit</option>
+<option value="MELAHIRKAN">Cuti Melahirkan</option>
+<option value="BESAR">Cuti Besar</option>
+<option value="ALASAN_PENTING">Alasan Penting</option>
+<option value="LUAR_NEGARA">Luar Negeri</option>
+</select>
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+<input id="tgl" type="date" class="input">
+<input id="lama" type="number" class="input" placeholder="Lama (hari)">
+</div>
+
+<textarea id="alamat" class="input h-24" placeholder="Alamat selama cuti"></textarea>
+
+<div id="reqBox" class="hidden req-card"></div>
+
+<div class="divider"></div>
+
+<div>
+<label class="font-semibold text-sm">Upload 2 File PDF <span class="text-xs text-slate-500">(maks 200 KB / file)</span></label>
+<input id="pdf1" type="file" accept="application/pdf" class="mt-2">
+<input id="pdf2" type="file" accept="application/pdf" class="mt-2">
+</div>
+
+<button onclick="showTTD()" class="mt-6 w-full py-4 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition">
+Lanjut ke Tanda Tangan
+</button>
+
+</section>
+
+<section id="ttdSection" class="hidden mt-8">
+<h2 class="font-bold text-lg mb-2">Tanda Tangan Digital</h2>
+<div class="border-2 border-dashed border-sky-300 rounded-2xl p-3 bg-sky-50">
+<canvas id="pad" class="w-full h-48 bg-white rounded-xl"></canvas>
+</div>
+<div class="flex justify-between mt-3">
+<button onclick="clearPad()" class="text-red-500 font-semibold">Hapus</button>
+<button onclick="submitForm()" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+Kirim Pengajuan
+</button>
+</div>
+</section>
+
+<!-- Notifikasi berhasil -->
+<div id="done" class="hidden text-center py-10">
+  <h2 class="text-xl font-bold text-emerald-600">Berhasil</h2>
+  <p class="text-slate-500">Pengajuan cuti telah dikirim</p>
+</div>
+
+</main>
+  <!-- Tampilan setelah selesai (tanpa input) -->
+<div id="afterDone" class="hidden text-center py-10 space-y-4">
+
+  <h2 class="text-2xl font-bold text-sky-700">Pengajuan Berhasil</h2>
+
+  <p class="text-slate-600">
+    Terima kasih, silakan selalu dipantau statusnya.<br>
+    <b>Cuti Anda akan segera diproses.</b>
+  </p>
+
+  <div class="mt-6 p-4 rounded-2xl bg-slate-100 text-left text-sm">
+    <p class="font-semibold mb-2">📄 Bukti Pengajuan Cuti</p>
+
+    <textarea id="buktiText"
+      class="w-full p-3 rounded-xl border bg-white text-slate-700"
+      rows="7" readonly></textarea>
+
+    <button onclick="copyBukti()"
+      class="mt-3 w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold">
+      Salin Bukti
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-4 mt-6">
+    <button onclick="resetForm()"
+      class="w-full py-4 rounded-2xl bg-slate-500 hover:bg-slate-600 text-white font-bold">
+      Isi Ulang
+    </button>
+
+    <a href="https://rikocagat.github.io/Tampilan-Cuti-RSDS/" target="_blank"
+       class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-center block">
+      Lihat Status Pengajuan
+    </a>
+  </div>
+
+</div>
+<!-- Loading overlay -->
+<div id="loading" class="hidden fixed inset-0 bg-white/80 backdrop-blur flex items-center justify-center z-50">
+  <div class="text-center">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-sky-500 border-t-transparent mx-auto"></div>
+    <p class="mt-4 font-semibold text-sky-700">Mengirim pengajuan...</p>
+  </div>
+</div>
+
+<script>
+const sb=supabase.createClient(
+'https://ufiqibxdgwlysqhinqbz.supabase.co',
+'sb_publishable_EVSVWnsUriOPA_O3RnGTpg_Zmd4pyAL'
+);
+  // ===== LIMIT FILE UI (200 KB) =====
+const MAX_UI_SIZE = 204800; // 200 KB
+
+['pdf1','pdf2'].forEach(id => {
+  const input = document.getElementById(id);
+  if(!input) return;
+
+  input.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    if (file.size > MAX_UI_SIZE) {
+      alert('Ukuran PDF maksimal 200 KB per file. Silakan kompres file.');
+      this.value = ''; // reset input
+    }
+  });
+});
+
+const requirements={
+TAHUNAN:['Berkas cuti terakhir','Formulir permohonan cuti'],
+SAKIT:['Surat keterangan dokter','Formulir permohonan cuti'],
+MELAHIRKAN:['Surat keterangan dokter','Formulir permohonan cuti'],
+BESAR:['Formulir cuti TTD Kabid/Kabag'],
+ALASAN_PENTING:['Bukti alasan penting','Formulir permohonan cuti'],
+LUAR_NEGARA:['Surat permohonan TTD PPK','Formulir permohonan cuti']
+};
+
+const nama=document.getElementById('nama');
+const nip=document.getElementById('nip');
+const jabatan=document.getElementById('jabatan');
+const acBox=document.getElementById('acBox');
+let timer;
+
+nama.addEventListener('input', ()=>{
+  clearTimeout(timer);
+  nip.value=''; jabatan.value='';
+  const q = nama.value.trim().toLowerCase();
+  if(q.length < 2){ acBox.classList.add('hidden'); return; }
+
+  // normalisasi: buang tanda baca & gelar umum
+  function normalize(str){
+    return str
+      .toLowerCase()
+      .replace(/[.,]/g,'')
+      .replace(/\b(dr|drg|sp|spd|spog|sp\.ort|ort)\b/g,'')
+      .trim();
+  }
+
+  // token-based match (mirip Google Sheets)
+function matchName(fullName, query){
+  const nameTokens  = normalize(fullName).split(/\s+/).filter(Boolean);
+  const queryTokens = normalize(query).split(/\s+/).filter(Boolean);
+
+  // kalau setelah normalisasi query kosong, JANGAN FILTER
+  if(queryTokens.length === 0) return true;
+
+  return queryTokens.every(qt =>
+    nameTokens.some(nt => nt.includes(qt))
+  );
+}
+  timer = setTimeout(async ()=>{
+    const key = q.split(' ')[0];
+
+const { data, error } = await sb
+  .from('pegawai')
+  .select('nama,nip_nik,jabatan')
+  .ilike('nama', `%${key}%`)
+  .order('nama')
+  .limit(50);
+    acBox.innerHTML = '';
+    if(error || !data?.length){
+      acBox.innerHTML = '<div class="p-4 text-slate-400">Tidak ada data</div>';
+    }else{
+      data
+        .filter(r => r.nama && matchName(r.nama, q))
+        .slice(0, 7)
+        .forEach(r=>{
+          const d = document.createElement('div');
+          d.className = 'ac-item';
+          d.innerHTML = `<span>${r.nama}</span><span>${r.nip_nik}</span>`;
+          d.onclick = ()=>{
+            nama.value = r.nama;
+            nip.value = r.nip_nik;
+            jabatan.value = r.jabatan;
+            acBox.classList.add('hidden');
+          };
+          acBox.appendChild(d);
+        });
+    }
+    acBox.classList.remove('hidden');
+  }, 300);
+});
+const jenis=document.getElementById('jenis');
+const reqBox=document.getElementById('reqBox');
+jenis.addEventListener('change',()=>{
+const r=requirements[jenis.value];
+if(!r){reqBox.classList.add('hidden');return}
+reqBox.innerHTML='<b>Syarat Dokumen:</b><br>'+r.map(x=>'• '+x).join('<br>');
+reqBox.classList.remove('hidden');
+});
+
+let pad;
+function showTTD(){
+document.getElementById('ttdSection').classList.remove('hidden');
+if(!pad) pad=new SignaturePad(document.getElementById('pad'),{backgroundColor:'#fff'});
+}
+function clearPad(){pad.clear()}
+
+async function submitForm(){
+try{
+document.getElementById('loading').classList.remove('hidden');
+
+if(pad.isEmpty()){
+document.getElementById('loading').classList.add('hidden');
+return alert('Tanda tangan wajib');
+}
+
+const f1=document.getElementById('pdf1').files[0];
+const f2=document.getElementById('pdf2').files[0];
+
+if(!f1||!f2){
+document.getElementById('loading').classList.add('hidden');
+return alert('Dua file PDF wajib');
+}
+
+// ===== LIMIT 200 KB =====
+if(f1.size > MAX_UI_SIZE || f2.size > MAX_UI_SIZE){
+document.getElementById('loading').classList.add('hidden');
+return alert('Ukuran PDF maksimal 200 KB per file');
+}
+
+const uid=crypto.randomUUID();
+
+const toBase64 = f => new Promise((res,rej)=>{
+const r=new FileReader();
+r.onload=()=>res(r.result.split(',')[1]);
+r.onerror=rej;
+r.readAsDataURL(f);
+});
+
+const payload = {
+uid,
+nama: nama.value,
+nip: nip.value,
+pdf1: { data: await toBase64(f1) },
+pdf2: { data: await toBase64(f2) },
+signature: await toBase64(
+await (await fetch(pad.toDataURL())).blob()
+)
+};
+
+// ===== KIRIM KE GAS =====
+const gasRes = await fetch('https://script.google.com/macros/s/AKfycbwK80UsUoGZEOJZZR4yiuIHVjJHOwaqrCqfurGgIIJXySpjSJKrManjH4-2-QzhbHXg/exec',{
+method:'POST',
+body: JSON.stringify(payload)
+});
+
+const gasData = await gasRes.json();
+if(gasData.error) throw new Error(gasData.error);
+
+// ===== SIMPAN KE SUPABASE =====
+await sb.from('pengajuan_cuti').insert({
+nama:nama.value,
+nip:nip.value,
+jabatan:jabatan.value,
+no_hp:hp.value,
+jenis_cuti:jenis.value,
+tgl_mulai:tgl.value,
+lama_cuti:lama.value,
+alamat:alamat.value,
+file_1_url:gasData.file1_url,
+file_2_url:gasData.file2_url,
+signature_url:gasData.signature_url,
+status:'DIAJUKAN'
+});
+
+// ===== BUAT BUKTI PENGAJUAN =====
+const now = new Date();
+const tanggal = now.toLocaleDateString('id-ID', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric'
+});
+const jam = now.toLocaleTimeString('id-ID');
+
+document.getElementById('buktiText').value =
+`BUKTI PENGAJUAN CUTI
+-------------------------
+Nama        : ${nama.value}
+NIP         : ${nip.value}
+Jabatan     : ${jabatan.value}
+Jenis Cuti  : ${jenis.value}
+
+Tanggal Pengajuan :
+${tanggal} ${jam}
+
+Status      : DIAJUKAN
+
+Silakan simpan bukti ini dan pantau status pengajuan Anda.`;
+
+// ===== RESET FORM =====
+document.querySelectorAll('input,textarea,select').forEach(e=>e.value='');
+pad.clear();
+document.getElementById('ttdSection').classList.add('hidden');
+
+// ===== TAMPILKAN HALAMAN SUKSES =====
+document.getElementById('loading').classList.add('hidden');
+document.querySelector('main').classList.add('hidden');
+document.getElementById('afterDone').classList.remove('hidden');
+
+}catch(e){
+document.getElementById('loading').classList.add('hidden');
+alert('ERROR: '+e.message);
+}}
+  function copyBukti(){
+  const txt = document.getElementById('buktiText');
+  txt.select();
+  txt.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+  alert('Bukti pengajuan berhasil disalin');
+}
+</script>
+</body>
+</html>
