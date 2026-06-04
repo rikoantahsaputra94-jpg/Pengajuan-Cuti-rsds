@@ -188,70 +188,85 @@ ALASAN_PENTING:['Bukti alasan penting','Formulir permohonan cuti'],
 LUAR_NEGARA:['Surat permohonan TTD PPK','Formulir permohonan cuti']
 };
 
+```javascript
 const nama=document.getElementById('nama');
 const nip=document.getElementById('nip');
 const jabatan=document.getElementById('jabatan');
 const acBox=document.getElementById('acBox');
+
 let timer;
 
 nama.addEventListener('input', ()=>{
-  clearTimeout(timer);
-  nip.value=''; jabatan.value='';
-  const q = nama.value.trim().toLowerCase();
-  if(q.length < 2){ acBox.classList.add('hidden'); return; }
 
-  // normalisasi: buang tanda baca & gelar umum
-  function normalize(str){
-    return str
-      .toLowerCase()
-      .replace(/[.,]/g,'')
-      .replace(/\b(dr|drg|sp|spd|spog|sp\.ort|ort)\b/g,'')
-      .trim();
+  clearTimeout(timer);
+
+  nip.value='';
+  jabatan.value='';
+
+  const q = nama.value.trim();
+
+  if(q.length < 2){
+    acBox.classList.add('hidden');
+    return;
   }
 
-  // token-based match (mirip Google Sheets)
-function matchName(fullName, query){
-  const nameTokens  = normalize(fullName).split(/\s+/).filter(Boolean);
-  const queryTokens = normalize(query).split(/\s+/).filter(Boolean);
-
-  // kalau setelah normalisasi query kosong, JANGAN FILTER
-  if(queryTokens.length === 0) return true;
-
-  return queryTokens.every(qt =>
-    nameTokens.some(nt => nt.includes(qt))
-  );
-}
   timer = setTimeout(async ()=>{
-    const key = q.split(' ')[0];
 
-const { data, error } = await sb
-  .from('pegawai')
-  .select('nama,nip_nik,jabatan')
-  .ilike('nama', `%${key}%`)
-  .order('nama')
-  .limit(50);
+    const { data, error } = await sb
+      .from('pegawai')
+      .select('nama,nip_nik,jabatan')
+      .ilike('nama', `%${q}%`)
+      .limit(100);
+
     acBox.innerHTML = '';
-    if(error || !data?.length){
-      acBox.innerHTML = '<div class="p-4 text-slate-400">Tidak ada data</div>';
-    }else{
-      data
-        .filter(r => r.nama && matchName(r.nama, q))
-        .slice(0, 7)
-        .forEach(r=>{
-          const d = document.createElement('div');
-          d.className = 'ac-item';
-          d.innerHTML = `<span>${r.nama}</span><span>${r.nip_nik}</span>`;
-          d.onclick = ()=>{
-            nama.value = r.nama;
-            nip.value = r.nip_nik;
-            jabatan.value = r.jabatan;
-            acBox.classList.add('hidden');
-          };
-          acBox.appendChild(d);
-        });
+
+    if(error){
+      console.error(error);
+      acBox.innerHTML =
+        '<div class="p-4 text-red-500">Gagal mengambil data</div>';
+      acBox.classList.remove('hidden');
+      return;
     }
+
+    if(!data || data.length === 0){
+      acBox.innerHTML =
+        '<div class="p-4 text-slate-400">Tidak ada data</div>';
+      acBox.classList.remove('hidden');
+      return;
+    }
+
+    data.slice(0,10).forEach(r=>{
+
+      const item = document.createElement('div');
+
+      item.className='ac-item';
+
+      item.innerHTML=`
+        <span>${r.nama}</span>
+        <span>${r.nip_nik}</span>
+      `;
+
+      item.onclick=()=>{
+        nama.value = r.nama;
+        nip.value = r.nip_nik || '';
+        jabatan.value = r.jabatan || '';
+        acBox.classList.add('hidden');
+      };
+
+      acBox.appendChild(item);
+
+    });
+
     acBox.classList.remove('hidden');
-  }, 300);
+
+  },300);
+
+});
+
+document.addEventListener('click', e=>{
+  if(!acBox.contains(e.target) && e.target !== nama){
+    acBox.classList.add('hidden');
+  }
 });
 const jenis=document.getElementById('jenis');
 const reqBox=document.getElementById('reqBox');
