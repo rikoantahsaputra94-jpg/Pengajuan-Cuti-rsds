@@ -219,14 +219,17 @@ nama.addEventListener('input', ()=>{
 
     acBox.innerHTML = '';
 
-    if(error){
-      console.error(error);
-      acBox.innerHTML =
-        '<div class="p-4 text-red-500">Gagal mengambil data</div>';
-      acBox.classList.remove('hidden');
-      return;
-    }
+```javascript
+if(error){
+  alert(JSON.stringify(error));
+  console.error(error);
 
+  acBox.innerHTML =
+    '<div class="p-4 text-red-500">Gagal mengambil data</div>';
+
+  acBox.classList.remove('hidden');
+  return;
+}
     if(!data || data.length === 0){
       acBox.innerHTML =
         '<div class="p-4 text-slate-400">Tidak ada data</div>';
