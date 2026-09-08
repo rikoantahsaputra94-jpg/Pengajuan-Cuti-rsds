@@ -1,410 +1,1345 @@
+```html
 <!doctype html>
 <html lang="id">
+
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Pengajuan Cuti RSDS</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 
 <style>
-body{background:linear-gradient(180deg,#e0f2fe,#f8fafc)}
-.card{background:#fff;border-radius:28px;box-shadow:0 30px 60px rgba(15,23,42,.12)}
-.input{width:100%;padding:14px 16px;border-radius:16px;border:1px solid #cbd5e1;font-size:15px}
-.input:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 4px rgba(14,165,233,.25)}
-.ac{position:absolute;z-index:50;background:#fff;border-radius:18px;border:1px solid #e2e8f0;max-height:260px;overflow:auto;width:100%;box-shadow:0 18px 40px rgba(0,0,0,.15)}
-.ac-item{padding:14px 18px;display:flex;justify-content:space-between;cursor:pointer}
-.ac-item:hover{background:#e0f2fe}
-.req-card{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:18px;padding:16px}
-canvas{touch-action:none}
-.divider{height:1px;background:linear-gradient(to right,transparent,#cbd5e1,transparent);margin:24px 0}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left,#e0f2fe 0,#f8fafc 42%,#eef6ff 100%);
+  font-family:Arial,sans-serif;
+}
+
+.main-wrap{
+  width:100%;
+  max-width:900px;
+  margin:auto;
+}
+
+.card{
+  background:rgba(255,255,255,.96);
+  border:1px solid rgba(226,232,240,.9);
+  border-radius:30px;
+  box-shadow:0 25px 70px rgba(15,23,42,.12);
+  backdrop-filter:blur(10px);
+}
+
+.header-box{
+  background:linear-gradient(135deg,#0369a1,#0284c7,#0ea5e9);
+  border-radius:24px;
+  color:white;
+  padding:28px;
+  box-shadow:0 15px 35px rgba(2,132,199,.22);
+}
+
+.input{
+  width:100%;
+  padding:14px 16px;
+  border-radius:15px;
+  border:1px solid #cbd5e1;
+  background:#fff;
+  font-size:15px;
+  transition:.2s;
+}
+
+.input:focus{
+  outline:none;
+  border-color:#0ea5e9;
+  box-shadow:0 0 0 4px rgba(14,165,233,.15);
+}
+
+.readonly{
+  background:#f1f5f9;
+  color:#475569;
+}
+
+.ac{
+  position:absolute;
+  z-index:100;
+  left:0;
+  right:0;
+  top:calc(100% + 6px);
+  background:#fff;
+  border-radius:16px;
+  border:1px solid #e2e8f0;
+  max-height:260px;
+  overflow:auto;
+  box-shadow:0 20px 40px rgba(15,23,42,.16);
+}
+
+.ac-item{
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  cursor:pointer;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.ac-item:last-child{
+  border-bottom:0;
+}
+
+.ac-item:hover{
+  background:#f0f9ff;
+}
+
+.req-card{
+  background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
+  border:1px solid #bae6fd;
+  border-radius:18px;
+  padding:16px;
+  color:#075985;
+}
+
+.divider{
+  height:1px;
+  background:linear-gradient(to right,transparent,#cbd5e1,transparent);
+  margin:26px 0;
+}
+
+.upload-box{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  padding:18px;
+}
+
+.file-input{
+  width:100%;
+  margin-top:8px;
+  padding:10px;
+  border:1px dashed #94a3b8;
+  border-radius:12px;
+  background:#fff;
+}
+
+canvas{
+  touch-action:none;
+  width:100%;
+  height:190px;
+}
+
+.submit-btn{
+  width:100%;
+  padding:16px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#0284c7,#0369a1);
+  color:white;
+  font-weight:700;
+  transition:.2s;
+  box-shadow:0 10px 25px rgba(2,132,199,.22);
+}
+
+.submit-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 30px rgba(2,132,199,.28);
+}
+
+.signature-box{
+  border:2px dashed #7dd3fc;
+  border-radius:20px;
+  padding:10px;
+  background:#f0f9ff;
+}
+
+.success-wrap{
+  min-height:100vh;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.success-card{
+  width:100%;
+  max-width:520px;
+  background:white;
+  border-radius:30px;
+  padding:38px 28px;
+  text-align:center;
+  box-shadow:0 25px 70px rgba(15,23,42,.14);
+  border:1px solid #e2e8f0;
+}
+
+.success-icon{
+  width:76px;
+  height:76px;
+  margin:0 auto 22px;
+  border-radius:50%;
+  background:#dcfce7;
+  color:#16a34a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:40px;
+  font-weight:bold;
+}
+
+.wa-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+  padding:16px;
+  border-radius:16px;
+  background:#16a34a;
+  color:white;
+  font-weight:700;
+  text-decoration:none;
+  transition:.2s;
+}
+
+.wa-btn:hover{
+  background:#15803d;
+  transform:translateY(-1px);
+}
+
+.reset-btn{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  background:#f1f5f9;
+  color:#475569;
+  font-weight:700;
+}
+
+@media(max-width:640px){
+
+  body{
+    padding:0;
+  }
+
+  .page-padding{
+    padding:12px;
+  }
+
+  .card{
+    border-radius:22px;
+    padding:16px !important;
+  }
+
+  .header-box{
+    border-radius:20px;
+    padding:22px 18px;
+  }
+
+  .header-box h1{
+    font-size:25px;
+  }
+
+  .grid-responsive{
+    grid-template-columns:1fr !important;
+  }
+
+  .success-wrap{
+    padding:16px;
+  }
+
+  .success-card{
+    padding:32px 20px;
+    border-radius:24px;
+  }
+
+}
+
 </style>
 </head>
 
-<body class="min-h-screen flex justify-center p-6">
-<main class="card w-full max-w-2xl p-8">
 
-<header class="mb-8">
-<h1 class="text-3xl font-bold text-sky-700">Pengajuan Cuti</h1>
-<p class="text-sm text-slate-500">RSUD dr. Soedarso</p>
-</header>
+<body>
 
-<section class="space-y-4">
 
-<div>
-<label class="font-semibold text-sm">Nama Pegawai</label>
-<div class="relative">
-<input id="nama" class="input" placeholder="Ketik minimal 2 huruf" autocomplete="off">
-<div id="acBox" class="ac hidden"></div>
-</div>
-</div>
+<!-- ============================= -->
+<!-- FORM UTAMA -->
+<!-- ============================= -->
 
-<div>
-<label class="font-semibold text-sm">NIP</label>
-<input id="nip" class="input bg-slate-100" readonly>
-</div>
+<div
+id="formPage"
+class="page-padding min-h-screen flex items-center justify-center"
+>
 
-<div>
-<label class="font-semibold text-sm">Jabatan</label>
-<input id="jabatan" class="input bg-slate-100" readonly>
+<div class="main-wrap">
+
+<div class="card p-5 sm:p-8">
+
+<!-- HEADER -->
+
+<div class="header-box mb-7">
+
+<div class="text-sm opacity-90 mb-1">
+RSUD dr. Soedarso
 </div>
 
-<div>
-<label class="font-semibold text-sm">No HP</label>
-<input id="hp" class="input">
+<h1 class="text-3xl sm:text-4xl font-bold">
+Pengajuan Cuti
+</h1>
+
+<p class="mt-2 text-sm opacity-90">
+Silakan lengkapi data pengajuan cuti Anda
+</p>
+
 </div>
 
+
+<section class="space-y-5">
+
+
+<!-- NAMA -->
+
 <div>
-<label class="font-semibold text-sm">Jenis Cuti</label>
-<select id="jenis" class="input">
-<option value="">-- Pilih Jenis Cuti --</option>
-<option value="TAHUNAN">Cuti Tahunan</option>
-<option value="SAKIT">Cuti Sakit</option>
-<option value="MELAHIRKAN">Cuti Melahirkan</option>
-<option value="BESAR">Cuti Besar</option>
-<option value="ALASAN_PENTING">Alasan Penting</option>
-<option value="LUAR_NEGARA">Luar Negeri</option>
+
+<label class="font-semibold text-sm text-slate-700">
+Nama Pegawai
+</label>
+
+<div class="relative mt-2">
+
+<input
+id="nama"
+class="input"
+placeholder="Ketik minimal 2 huruf"
+autocomplete="off"
+>
+
+<div
+id="acBox"
+class="ac hidden">
+</div>
+
+</div>
+
+</div>
+
+
+<!-- NIP -->
+
+<div>
+
+<label class="font-semibold text-sm text-slate-700">
+NIP / NIK
+</label>
+
+<input
+id="nip"
+class="input readonly mt-2"
+readonly
+>
+
+</div>
+
+
+<!-- JABATAN -->
+
+<div>
+
+<label class="font-semibold text-sm text-slate-700">
+Jabatan
+</label>
+
+<input
+id="jabatan"
+class="input readonly mt-2"
+readonly
+>
+
+</div>
+
+
+<!-- HP -->
+
+<div>
+
+<label class="font-semibold text-sm text-slate-700">
+No HP
+</label>
+
+<input
+id="hp"
+class="input mt-2"
+type="tel"
+placeholder="08xxxxxxxxxx"
+>
+
+</div>
+
+
+<!-- JENIS CUTI -->
+
+<div>
+
+<label class="font-semibold text-sm text-slate-700">
+Jenis Cuti
+</label>
+
+<select
+id="jenis"
+class="input mt-2"
+>
+
+<option value="">
+-- Pilih Jenis Cuti --
+</option>
+
+<option value="TAHUNAN">
+Cuti Tahunan
+</option>
+
+<option value="SAKIT">
+Cuti Sakit
+</option>
+
+<option value="MELAHIRKAN">
+Cuti Melahirkan
+</option>
+
+<option value="BESAR">
+Cuti Besar
+</option>
+
+<option value="ALASAN_PENTING">
+Alasan Penting
+</option>
+
+<option value="LUAR_NEGARA">
+Luar Negeri
+</option>
+
 </select>
+
 </div>
 
-<div class="grid grid-cols-2 gap-4">
-<input id="tgl" type="date" class="input">
-<input id="lama" type="number" class="input" placeholder="Lama (hari)">
+
+<!-- TANGGAL DAN LAMA -->
+
+<div class="grid grid-cols-2 gap-4 grid-responsive">
+
+<div>
+
+<label class="font-semibold text-sm text-slate-700">
+Tanggal Mulai
+</label>
+
+<input
+id="tgl"
+type="date"
+class="input mt-2"
+>
+
 </div>
 
-<textarea id="alamat" class="input h-24" placeholder="Alamat selama cuti"></textarea>
 
-<div id="reqBox" class="hidden req-card"></div>
+<div>
+
+<label class="font-semibold text-sm text-slate-700">
+Lama Cuti
+</label>
+
+<input
+id="lama"
+type="number"
+min="1"
+class="input mt-2"
+placeholder="Jumlah hari"
+>
+
+</div>
+
+</div>
+
+
+<!-- ALAMAT -->
+
+<div>
+
+<label class="font-semibold text-sm text-slate-700">
+Alamat Selama Cuti
+</label>
+
+<textarea
+id="alamat"
+class="input mt-2 h-28"
+placeholder="Masukkan alamat selama menjalankan cuti">
+</textarea>
+
+</div>
+
+
+<!-- SYARAT -->
+
+<div
+id="reqBox"
+class="hidden req-card">
+</div>
+
 
 <div class="divider"></div>
 
-<div>
-<label class="font-semibold text-sm">Upload 2 File PDF <span class="text-xs text-slate-500">(maks 200 KB / file)</span></label>
-<input id="pdf1" type="file" accept="application/pdf" class="mt-2">
-<input id="pdf2" type="file" accept="application/pdf" class="mt-2">
+
+<!-- FILE -->
+
+<div class="upload-box">
+
+<label class="font-semibold text-sm text-slate-700">
+Dokumen Pendukung
+</label>
+
+<p class="text-xs text-slate-500 mt-1 mb-3">
+Upload 2 file PDF. Maksimal 200 KB per file.
+</p>
+
+
+<label class="text-sm font-medium text-slate-600">
+Dokumen 1
+</label>
+
+<input
+id="pdf1"
+type="file"
+accept="application/pdf"
+class="file-input"
+>
+
+
+<label class="text-sm font-medium text-slate-600 block mt-4">
+Dokumen 2
+</label>
+
+<input
+id="pdf2"
+type="file"
+accept="application/pdf"
+class="file-input"
+>
+
 </div>
 
-<button onclick="showTTD()" class="mt-6 w-full py-4 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition">
+
+<!-- TOMBOL -->
+
+<button
+onclick="showTTD()"
+class="submit-btn mt-5"
+>
+
 Lanjut ke Tanda Tangan
+
 </button>
 
 </section>
 
-<section id="ttdSection" class="hidden mt-8">
-<h2 class="font-bold text-lg mb-2">Tanda Tangan Digital</h2>
-<div class="border-2 border-dashed border-sky-300 rounded-2xl p-3 bg-sky-50">
-<canvas id="pad" class="w-full h-48 bg-white rounded-xl"></canvas>
+
+<!-- ============================= -->
+<!-- TANDA TANGAN -->
+<!-- ============================= -->
+
+<section
+id="ttdSection"
+class="hidden mt-8"
+>
+
+<div class="divider"></div>
+
+<h2 class="font-bold text-xl text-slate-800">
+Tanda Tangan Digital
+</h2>
+
+<p class="text-sm text-slate-500 mt-1 mb-3">
+Silakan tanda tangan pada area di bawah.
+</p>
+
+
+<div class="signature-box">
+
+<canvas
+id="pad">
+</canvas>
+
 </div>
-<div class="flex justify-between mt-3">
-<button onclick="clearPad()" class="text-red-500 font-semibold">Hapus</button>
-<button onclick="submitForm()" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+
+
+<div class="flex justify-between items-center mt-4">
+
+<button
+onclick="clearPad()"
+class="text-red-500 font-semibold"
+>
+Hapus Tanda Tangan
+</button>
+
+
+<button
+onclick="submitForm()"
+class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+>
 Kirim Pengajuan
 </button>
+
 </div>
+
 </section>
 
-<!-- Notifikasi berhasil -->
-<div id="done" class="hidden text-center py-10">
-  <h2 class="text-xl font-bold text-emerald-600">Berhasil</h2>
-  <p class="text-slate-500">Pengajuan cuti telah dikirim</p>
 </div>
 
-</main>
-  <!-- Tampilan setelah selesai (tanpa input) -->
-<div id="afterDone" class="hidden text-center py-10 space-y-4">
-
-  <h2 class="text-2xl font-bold text-sky-700">Pengajuan Berhasil</h2>
-
-  <p class="text-slate-600">
-    Terima kasih, silakan selalu dipantau statusnya.<br>
-    <b>Cuti Anda akan segera diproses.</b>
-  </p>
-
-  <div class="mt-6 p-4 rounded-2xl bg-slate-100 text-left text-sm">
-    <p class="font-semibold mb-2">📄 Bukti Pengajuan Cuti</p>
-
-    <textarea id="buktiText"
-      class="w-full p-3 rounded-xl border bg-white text-slate-700"
-      rows="7" readonly></textarea>
-
-    <button onclick="copyBukti()"
-      class="mt-3 w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold">
-      Salin Bukti
-    </button>
-  </div>
-
-  <div class="flex flex-col gap-4 mt-6">
-    <button onclick="resetForm()"
-      class="w-full py-4 rounded-2xl bg-slate-500 hover:bg-slate-600 text-white font-bold">
-      Isi Ulang
-    </button>
-
-    <a href="https://rikocagat.github.io/Tampilan-Cuti-RSDS/" target="_blank"
-       class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-center block">
-      Lihat Status Pengajuan
-    </a>
-  </div>
+</div>
 
 </div>
-<!-- Loading overlay -->
-<div id="loading" class="hidden fixed inset-0 bg-white/80 backdrop-blur flex items-center justify-center z-50">
-  <div class="text-center">
-    <div class="animate-spin rounded-full h-16 w-16 border-4 border-sky-500 border-t-transparent mx-auto"></div>
-    <p class="mt-4 font-semibold text-sky-700">Mengirim pengajuan...</p>
-  </div>
+
+
+<!-- ============================= -->
+<!-- HALAMAN SUKSES -->
+<!-- ============================= -->
+
+<div
+id="afterDone"
+class="hidden success-wrap"
+>
+
+<div class="success-card">
+
+<div class="success-icon">
+✓
 </div>
+
+
+<h2 class="text-2xl sm:text-3xl font-bold text-slate-800">
+Terima Kasih
+</h2>
+
+
+<p class="text-lg text-slate-600 mt-3">
+Pengajuan Cuti Anda
+</p>
+
+<p class="text-lg font-bold text-sky-700">
+Akan Diproses
+</p>
+
+
+<div class="mt-7">
+
+<p class="text-sm text-slate-500 mb-3">
+Jika ada yang ingin dikonfirmasi, silakan hubungi:
+</p>
+
+
+<a
+href="https://wa.me/6282134345181"
+target="_blank"
+class="wa-btn"
+>
+
+<span style="font-size:22px;">💬</span>
+
+<span>
+Konfirmasi melalui WhatsApp
+</span>
+
+</a>
+
+</div>
+
+
+<button
+onclick="resetForm()"
+class="reset-btn mt-4"
+>
+Ajukan Cuti Baru
+</button>
+
+
+<p class="text-xs text-slate-400 mt-6">
+RSUD dr. Soedarso
+</p>
+
+</div>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- LOADING -->
+<!-- ============================= -->
+
+<div
+id="loading"
+class="hidden fixed inset-0 bg-white/85 backdrop-blur flex items-center justify-center z-50"
+>
+
+<div class="text-center">
+
+<div
+class="animate-spin rounded-full h-16 w-16 border-4 border-sky-500 border-t-transparent mx-auto">
+</div>
+
+<p class="mt-4 font-semibold text-sky-700">
+Mengirim pengajuan...
+</p>
+
+<p class="text-sm text-slate-500 mt-1">
+Mohon tunggu sebentar
+</p>
+
+</div>
+
+</div>
+
 
 <script>
-const sb=supabase.createClient(
-'https://ufiqibxdgwlysqhinqbz.supabase.co',
-'sb_publishable_EVSVWnsUriOPA_O3RnGTpg_Zmd4pyAL'
-);
-  // ===== LIMIT FILE UI (200 KB) =====
-const MAX_UI_SIZE = 204800; // 200 KB
 
-['pdf1','pdf2'].forEach(id => {
-  const input = document.getElementById(id);
-  if(!input) return;
 
-  input.addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
+// =================================================
+// GOOGLE APPS SCRIPT
+// =================================================
 
-    if (file.size > MAX_UI_SIZE) {
-      alert('Ukuran PDF maksimal 200 KB per file. Silakan kompres file.');
-      this.value = ''; // reset input
-    }
-  });
-});
+const GAS_URL =
+'https://script.google.com/macros/s/AKfycbz2qvV_L74DmLvAqUAwSn7ZGP5PHY6kdExmBEID_BPG1tbgWEZYD2EEkUEGff1OX_FVJw/exec';
 
-const requirements={
-TAHUNAN:['Berkas cuti terakhir','Formulir permohonan cuti'],
-SAKIT:['Surat keterangan dokter','Formulir permohonan cuti'],
-MELAHIRKAN:['Surat keterangan dokter','Formulir permohonan cuti'],
-BESAR:['Formulir cuti TTD Kabid/Kabag'],
-ALASAN_PENTING:['Bukti alasan penting','Formulir permohonan cuti'],
-LUAR_NEGARA:['Surat permohonan TTD PPK','Formulir permohonan cuti']
+
+// =================================================
+// BATAS FILE
+// =================================================
+
+const MAX_UI_SIZE = 204800;
+
+
+// =================================================
+// ELEMENT
+// =================================================
+
+const nama =
+document.getElementById('nama');
+
+const nip =
+document.getElementById('nip');
+
+const jabatan =
+document.getElementById('jabatan');
+
+const hp =
+document.getElementById('hp');
+
+const jenis =
+document.getElementById('jenis');
+
+const tgl =
+document.getElementById('tgl');
+
+const lama =
+document.getElementById('lama');
+
+const alamat =
+document.getElementById('alamat');
+
+const acBox =
+document.getElementById('acBox');
+
+const reqBox =
+document.getElementById('reqBox');
+
+
+// =================================================
+// SYARAT CUTI
+// =================================================
+
+const requirements = {
+
+TAHUNAN:[
+'Berkas cuti terakhir',
+'Formulir permohonan cuti'
+],
+
+SAKIT:[
+'Surat keterangan dokter',
+'Formulir permohonan cuti'
+],
+
+MELAHIRKAN:[
+'Surat keterangan dokter',
+'Formulir permohonan cuti'
+],
+
+BESAR:[
+'Formulir cuti TTD Kabid/Kabag'
+],
+
+ALASAN_PENTING:[
+'Bukti alasan penting',
+'Formulir permohonan cuti'
+],
+
+LUAR_NEGARA:[
+'Surat permohonan TTD PPK',
+'Formulir permohonan cuti'
+]
+
 };
 
-const nama=document.getElementById('nama');
-const nip=document.getElementById('nip');
-const jabatan=document.getElementById('jabatan');
-const acBox=document.getElementById('acBox');
+
+// =================================================
+// AUTOCOMPLETE
+// =================================================
 
 let timer;
 
-nama.addEventListener('input', ()=>{
+nama.addEventListener('input',()=>{
 
-  clearTimeout(timer);
+clearTimeout(timer);
 
-  nip.value='';
-  jabatan.value='';
+nip.value='';
+jabatan.value='';
 
-  const q = nama.value.trim();
+const q =
+nama.value.trim();
 
-  if(q.length < 2){
-    acBox.classList.add('hidden');
-    return;
-  }
 
-  timer = setTimeout(async ()=>{
+if(q.length < 2){
 
-    const { data, error } = await sb
-      .from('pegawai')
-      .select('nama,nip_nik,jabatan')
-      .ilike('nama', `%${q}%`)
-      .limit(100);
+acBox.classList.add('hidden');
 
-    acBox.innerHTML = '';
-    
-if(error){
-  alert(JSON.stringify(error));
-  console.error(error);
-
-  acBox.innerHTML =
-    '<div class="p-4 text-red-500">Gagal mengambil data</div>';
-
-  acBox.classList.remove('hidden');
-  return;
+return;
 }
-    if(!data || data.length === 0){
-      acBox.innerHTML =
-        '<div class="p-4 text-slate-400">Tidak ada data</div>';
-      acBox.classList.remove('hidden');
-      return;
-    }
 
-    data.slice(0,10).forEach(r=>{
 
-      const item = document.createElement('div');
+timer=setTimeout(async()=>{
 
-      item.className='ac-item';
-
-      item.innerHTML=`
-        <span>${r.nama}</span>
-        <span>${r.nip_nik}</span>
-      `;
-
-      item.onclick=()=>{
-        nama.value = r.nama;
-        nip.value = r.nip_nik || '';
-        jabatan.value = r.jabatan || '';
-        acBox.classList.add('hidden');
-      };
-
-      acBox.appendChild(item);
-
-    });
-
-    acBox.classList.remove('hidden');
-
-  },300);
-
-});
-
-document.addEventListener('click', e=>{
-  if(!acBox.contains(e.target) && e.target !== nama){
-    acBox.classList.add('hidden');
-  }
-});
-const jenis=document.getElementById('jenis');
-const reqBox=document.getElementById('reqBox');
-jenis.addEventListener('change',()=>{
-const r=requirements[jenis.value];
-if(!r){reqBox.classList.add('hidden');return}
-reqBox.innerHTML='<b>Syarat Dokumen:</b><br>'+r.map(x=>'• '+x).join('<br>');
-reqBox.classList.remove('hidden');
-});
-
-let pad;
-function showTTD(){
-document.getElementById('ttdSection').classList.remove('hidden');
-if(!pad) pad=new SignaturePad(document.getElementById('pad'),{backgroundColor:'#fff'});
-}
-function clearPad(){pad.clear()}
-
-async function submitForm(){
 try{
-document.getElementById('loading').classList.remove('hidden');
 
-if(pad.isEmpty()){
-document.getElementById('loading').classList.add('hidden');
-return alert('Tanda tangan wajib');
+const url =
+GAS_URL +
+'?action=pegawai&q=' +
+encodeURIComponent(q);
+
+
+const response =
+await fetch(url);
+
+
+const result =
+await response.json();
+
+
+acBox.innerHTML='';
+
+
+if(!result.success){
+
+throw new Error(
+result.error ||
+'Gagal mengambil data pegawai'
+);
+
 }
 
-const f1=document.getElementById('pdf1').files[0];
-const f2=document.getElementById('pdf2').files[0];
 
-if(!f1||!f2){
-document.getElementById('loading').classList.add('hidden');
-return alert('Dua file PDF wajib');
+const data =
+result.data || [];
+
+
+if(data.length===0){
+
+acBox.innerHTML=
+'<div class="p-4 text-slate-400">Tidak ada data pegawai</div>';
+
+acBox.classList.remove('hidden');
+
+return;
 }
 
-// ===== LIMIT 200 KB =====
-if(f1.size > MAX_UI_SIZE || f2.size > MAX_UI_SIZE){
-document.getElementById('loading').classList.add('hidden');
-return alert('Ukuran PDF maksimal 200 KB per file');
-}
 
-const uid=crypto.randomUUID();
+data.forEach(r=>{
 
-const toBase64 = f => new Promise((res,rej)=>{
-const r=new FileReader();
-r.onload=()=>res(r.result.split(',')[1]);
-r.onerror=rej;
-r.readAsDataURL(f);
-});
+const item =
+document.createElement('div');
 
-const payload = {
-uid,
-nama: nama.value,
-nip: nip.value,
-pdf1: { data: await toBase64(f1) },
-pdf2: { data: await toBase64(f2) },
-signature: await toBase64(
-await (await fetch(pad.toDataURL())).blob()
-)
+item.className='ac-item';
+
+
+item.innerHTML=`
+
+<span class="font-medium text-slate-700">
+${escapeHtml(r.nama)}
+</span>
+
+<span class="text-sm text-slate-500">
+${escapeHtml(r.nip_nik || '')}
+</span>
+
+`;
+
+
+item.onclick=()=>{
+
+nama.value=r.nama;
+
+nip.value=r.nip_nik || '';
+
+jabatan.value=r.jabatan || '';
+
+acBox.classList.add('hidden');
+
 };
 
-// ===== KIRIM KE GAS =====
-const gasRes = await fetch('https://script.google.com/macros/s/AKfycbwK80UsUoGZEOJZZR4yiuIHVjJHOwaqrCqfurGgIIJXySpjSJKrManjH4-2-QzhbHXg/exec',{
-method:'POST',
-body: JSON.stringify(payload)
+
+acBox.appendChild(item);
+
 });
 
-const gasData = await gasRes.json();
-if(gasData.error) throw new Error(gasData.error);
 
-// ===== SIMPAN KE SUPABASE =====
-await sb.from('pengajuan_cuti').insert({
-nama:nama.value,
-nip:nip.value,
-jabatan:jabatan.value,
-no_hp:hp.value,
-jenis_cuti:jenis.value,
-tgl_mulai:tgl.value,
-lama_cuti:lama.value,
-alamat:alamat.value,
-file_1_url:gasData.file1_url,
-file_2_url:gasData.file2_url,
-signature_url:gasData.signature_url,
-status:'DIAJUKAN'
+acBox.classList.remove('hidden');
+
+
+}catch(e){
+
+console.error(e);
+
+acBox.innerHTML=
+'<div class="p-4 text-red-500">Gagal mengambil data pegawai</div>';
+
+acBox.classList.remove('hidden');
+
+}
+
+},300);
+
 });
 
-// ===== HALAMAN SUKSES =====
-const now = new Date();
 
-const tanggal = now.toLocaleDateString('id-ID', {
-  day: '2-digit',
-  month: 'long',
-  year: 'numeric'
+// =================================================
+// TUTUP AUTOCOMPLETE
+// =================================================
+
+document.addEventListener('click',e=>{
+
+if(
+!acBox.contains(e.target) &&
+e.target!==nama
+){
+
+acBox.classList.add('hidden');
+
+}
+
 });
 
-const jam = now.toLocaleTimeString('id-ID');
 
-document.querySelectorAll('input,textarea,select').forEach(e => e.value = '');
+// =================================================
+// JENIS CUTI
+// =================================================
+
+jenis.addEventListener('change',()=>{
+
+const r =
+requirements[jenis.value];
+
+
+if(!r){
+
+reqBox.classList.add('hidden');
+
+return;
+}
+
+
+reqBox.innerHTML =
+'<b>Syarat Dokumen:</b><br>' +
+r.map(x=>'• '+x).join('<br>');
+
+
+reqBox.classList.remove('hidden');
+
+});
+
+
+// =================================================
+// VALIDASI PDF
+// =================================================
+
+['pdf1','pdf2'].forEach(id=>{
+
+const input =
+document.getElementById(id);
+
+
+input.addEventListener('change',function(){
+
+const file =
+this.files[0];
+
+if(!file)return;
+
+
+if(file.type !== 'application/pdf'){
+
+alert('File harus berupa PDF');
+
+this.value='';
+
+return;
+
+}
+
+
+if(file.size > MAX_UI_SIZE){
+
+alert(
+'Ukuran PDF maksimal 200 KB per file.'
+);
+
+this.value='';
+
+}
+
+});
+
+});
+
+
+// =================================================
+// TANDA TANGAN
+// =================================================
+
+let pad;
+
+
+function showTTD(){
+
+document
+.getElementById('ttdSection')
+.classList
+.remove('hidden');
+
+
+if(!pad){
+
+pad =
+new SignaturePad(
+document.getElementById('pad'),
+{
+backgroundColor:'#fff'
+}
+);
+
+}
+
+}
+
+
+function clearPad(){
+
+if(pad){
 
 pad.clear();
 
-document.getElementById('ttdSection').classList.add('hidden');
-document.getElementById('loading').classList.add('hidden');
+}
 
-document.querySelector('main').classList.add('hidden');
+}
 
-document.getElementById('afterDone').innerHTML = `
-<div class="min-h-screen flex items-center justify-center p-6">
-  <div class="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md w-full">
 
-    <h2 class="text-2xl font-bold text-emerald-600 mb-4">
-      Terima Kasih
-    </h2>
+// =================================================
+// BASE64
+// =================================================
 
-    <p class="text-slate-600">
-      Cuti Anda akan diproses.
-    </p>
+function toBase64(file){
 
-    <div class="mt-5 p-4 rounded-2xl bg-slate-100">
-      <div class="text-sm text-slate-500">
-        Tanggal Pengajuan
-      </div>
+return new Promise((resolve,reject)=>{
 
-      <div class="font-semibold text-slate-700 mt-1">
-        ${tanggal} ${jam}
-      </div>
-    </div>
+const reader =
+new FileReader();
 
-  </div>
-</div>
-`;
 
-document.getElementById('afterDone').classList.remove('hidden');
+reader.onload=()=>{
+resolve(
+reader.result.split(',')[1]
+);
+};
+
+
+reader.onerror=reject;
+
+reader.readAsDataURL(file);
+
+});
+
+}
+
+
+// =================================================
+// SUBMIT
+// =================================================
+
+async function submitForm(){
+
+try{
+
+document
+.getElementById('loading')
+.classList
+.remove('hidden');
+
+
+if(!nama.value){
+
+throw new Error(
+'Nama pegawai wajib dipilih'
+);
+
+}
+
+
+if(!nip.value){
+
+throw new Error(
+'NIP/NIK tidak ditemukan'
+);
+
+}
+
+
+if(!jenis.value){
+
+throw new Error(
+'Jenis cuti wajib dipilih'
+);
+
+}
+
+
+if(!tgl.value){
+
+throw new Error(
+'Tanggal mulai wajib diisi'
+);
+
+}
+
+
+if(!lama.value){
+
+throw new Error(
+'Lama cuti wajib diisi'
+);
+
+}
+
+
+if(!pad || pad.isEmpty()){
+
+throw new Error(
+'Tanda tangan wajib'
+);
+
+}
+
+
+const f1 =
+document.getElementById('pdf1').files[0];
+
+const f2 =
+document.getElementById('pdf2').files[0];
+
+
+if(!f1 || !f2){
+
+throw new Error(
+'Dua file PDF wajib'
+);
+
+}
+
+
+if(
+f1.size > MAX_UI_SIZE ||
+f2.size > MAX_UI_SIZE
+){
+
+throw new Error(
+'Ukuran PDF maksimal 200 KB per file'
+);
+
+}
+
+
+// =================================================
+// ID PENGAJUAN
+// =================================================
+
+const uid =
+crypto.randomUUID();
+
+
+// =================================================
+// SIGNATURE
+// =================================================
+
+const signatureBlob =
+await (
+await fetch(
+pad.toDataURL()
+)
+).blob();
+
+
+// =================================================
+// PAYLOAD
+// =================================================
+
+const payload={
+
+uid:uid,
+
+nama:nama.value,
+
+nip:nip.value,
+
+jabatan:jabatan.value,
+
+no_hp:hp.value,
+
+jenis_cuti:jenis.value,
+
+tgl_mulai:tgl.value,
+
+lama_cuti:lama.value,
+
+alamat:alamat.value,
+
+pdf1:{
+data:await toBase64(f1)
+},
+
+pdf2:{
+data:await toBase64(f2)
+},
+
+signature:{
+data:await toBase64(signatureBlob)
+}
+
+};
+
+
+// =================================================
+// KIRIM KE GAS
+// =================================================
+
+const response =
+await fetch(
+GAS_URL,
+{
+method:'POST',
+body:JSON.stringify(payload)
+}
+);
+
+
+const result =
+await response.json();
+
+
+if(!result.success){
+
+throw new Error(
+result.error ||
+'Gagal menyimpan pengajuan'
+);
+
+}
+
+
+// =================================================
+// TAMPILAN SUKSES
+// =================================================
+
+document
+.getElementById('loading')
+.classList
+.add('hidden');
+
+
+document
+.getElementById('formPage')
+.classList
+.add('hidden');
+
+
+document
+.getElementById('afterDone')
+.classList
+.remove('hidden');
+
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+});
+
 
 }catch(e){
-document.getElementById('loading').classList.add('hidden');
-alert('ERROR: ' + e.message);
-}}
+
+console.error(e);
+
+document
+.getElementById('loading')
+.classList
+.add('hidden');
+
+
+alert(
+'ERROR: ' + e.message
+);
+
+}
+
+}
+
+
+// =================================================
+// RESET
+// =================================================
+
+function resetForm(){
+
+location.reload();
+
+}
+
+
+// =================================================
+// ESCAPE HTML
+// =================================================
+
+function escapeHtml(value){
+
+return String(value || '')
+.replace(/&/g,'&amp;')
+.replace(/</g,'&lt;')
+.replace(/>/g,'&gt;')
+.replace(/"/g,'&quot;')
+.replace(/'/g,'&#039;');
+
+}
+
 </script>
+
 </body>
 </html>
+```
