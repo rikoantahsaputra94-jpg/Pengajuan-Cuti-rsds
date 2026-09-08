@@ -158,6 +158,11 @@ canvas{
   background:#f0f9ff;
 }
 
+
+/* =========================================
+   HALAMAN TERIMA KASIH
+   ========================================= */
+
 .success-wrap{
   min-height:100vh;
   width:100%;
@@ -172,54 +177,18 @@ canvas{
   max-width:520px;
   background:white;
   border-radius:30px;
-  padding:38px 28px;
+  padding:45px 28px;
   text-align:center;
   box-shadow:0 25px 70px rgba(15,23,42,.14);
   border:1px solid #e2e8f0;
 }
 
-.success-icon{
-  width:76px;
-  height:76px;
-  margin:0 auto 22px;
-  border-radius:50%;
-  background:#dcfce7;
-  color:#16a34a;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:40px;
-  font-weight:bold;
-}
-
-.wa-btn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  width:100%;
-  padding:16px;
-  border-radius:16px;
-  background:#16a34a;
-  color:white;
+.success-title{
+  font-size:32px;
   font-weight:700;
-  text-decoration:none;
-  transition:.2s;
+  color:#1e293b;
 }
 
-.wa-btn:hover{
-  background:#15803d;
-  transform:translateY(-1px);
-}
-
-.reset-btn{
-  width:100%;
-  padding:14px;
-  border-radius:16px;
-  background:#f1f5f9;
-  color:#475569;
-  font-weight:700;
-}
 
 @media(max-width:640px){
 
@@ -254,8 +223,12 @@ canvas{
   }
 
   .success-card{
-    padding:32px 20px;
+    padding:38px 20px;
     border-radius:24px;
+  }
+
+  .success-title{
+    font-size:28px;
   }
 
 }
@@ -604,7 +577,8 @@ Kirim Pengajuan
 
 
 <!-- ============================= -->
-<!-- HALAMAN SUKSES -->
+<!-- HALAMAN TERIMA KASIH -->
+<!-- HANYA MUNCUL SETELAH BERHASIL -->
 <!-- ============================= -->
 
 <div
@@ -614,60 +588,9 @@ class="hidden success-wrap"
 
 <div class="success-card">
 
-<div class="success-icon">
-✓
-</div>
-
-
-<h2 class="text-2xl sm:text-3xl font-bold text-slate-800">
+<div class="success-title">
 Terima Kasih
-</h2>
-
-
-<p class="text-lg text-slate-600 mt-3">
-Pengajuan Cuti Anda
-</p>
-
-<p class="text-lg font-bold text-sky-700">
-Akan Diproses
-</p>
-
-
-<div class="mt-7">
-
-<p class="text-sm text-slate-500 mb-3">
-Jika ada yang ingin dikonfirmasi, silakan hubungi:
-</p>
-
-
-<a
-href="https://wa.me/6282134345181"
-target="_blank"
-class="wa-btn"
->
-
-<span style="font-size:22px;">💬</span>
-
-<span>
-Konfirmasi melalui WhatsApp
-</span>
-
-</a>
-
 </div>
-
-
-<button
-onclick="resetForm()"
-class="reset-btn mt-4"
->
-Ajukan Cuti Baru
-</button>
-
-
-<p class="text-xs text-slate-400 mt-6">
-RSUD dr. Soedarso
-</p>
 
 </div>
 
@@ -756,10 +679,10 @@ document.getElementById('reqBox');
 
 
 // =================================================
-// PAKSA HALAMAN AWAL SELALU FORM
+// PAKSA SAAT HALAMAN DIBUKA SELALU FORM
 // =================================================
 
-function showInitialForm(){
+document.addEventListener('DOMContentLoaded',()=>{
 
   document
   .getElementById('formPage')
@@ -771,16 +694,7 @@ function showInitialForm(){
   .classList
   .add('hidden');
 
-  document
-  .getElementById('loading')
-  .classList
-  .add('hidden');
-
-}
-
-
-// Jalankan setiap kali halaman dibuka / di-refresh
-window.addEventListener('DOMContentLoaded',showInitialForm);
+});
 
 
 // =================================================
@@ -1293,11 +1207,8 @@ result.error ||
 
 
 // =================================================
-// TAMPILAN SUKSES
+// SETELAH BERHASIL
 // =================================================
-
-// Hanya di sini halaman "Terima Kasih"
-// boleh ditampilkan setelah respon berhasil.
 
 document
 .getElementById('loading')
@@ -1305,18 +1216,21 @@ document
 .add('hidden');
 
 
+// FORM DIHILANGKAN SEPENUHNYA
 document
 .getElementById('formPage')
 .classList
 .add('hidden');
 
 
+// BAGIAN "TERIMA KASIH" DITAMPILKAN
 document
 .getElementById('afterDone')
 .classList
 .remove('hidden');
 
 
+// POSISI KE ATAS
 window.scrollTo({
 top:0,
 behavior:'smooth'
@@ -1348,62 +1262,7 @@ alert(
 
 function resetForm(){
 
-// Bersihkan tampilan sukses dan kembali ke form.
-// Tidak menyimpan status "Terima Kasih".
-
-document
-.getElementById('afterDone')
-.classList
-.add('hidden');
-
-document
-.getElementById('formPage')
-.classList
-.remove('hidden');
-
-
-// Reset seluruh input
-document
-.querySelectorAll('input, textarea, select')
-.forEach(el=>{
-
-if(el.type === 'file'){
-el.value='';
-}else{
-el.value='';
-}
-
-});
-
-
-// Reset tanda tangan
-if(pad){
-pad.clear();
-}
-
-
-// Reset syarat
-reqBox.innerHTML='';
-reqBox.classList.add('hidden');
-
-
-// Reset autocomplete
-acBox.innerHTML='';
-acBox.classList.add('hidden');
-
-
-// Sembunyikan bagian TTD
-document
-.getElementById('ttdSection')
-.classList
-.add('hidden');
-
-
-// Kembali ke atas
-window.scrollTo({
-top:0,
-behavior:'smooth'
-});
+location.reload();
 
 }
 
