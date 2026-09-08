@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="id">
 
@@ -757,6 +756,34 @@ document.getElementById('reqBox');
 
 
 // =================================================
+// PAKSA HALAMAN AWAL SELALU FORM
+// =================================================
+
+function showInitialForm(){
+
+  document
+  .getElementById('formPage')
+  .classList
+  .remove('hidden');
+
+  document
+  .getElementById('afterDone')
+  .classList
+  .add('hidden');
+
+  document
+  .getElementById('loading')
+  .classList
+  .add('hidden');
+
+}
+
+
+// Jalankan setiap kali halaman dibuka / di-refresh
+window.addEventListener('DOMContentLoaded',showInitialForm);
+
+
+// =================================================
 // SYARAT CUTI
 // =================================================
 
@@ -1269,6 +1296,9 @@ result.error ||
 // TAMPILAN SUKSES
 // =================================================
 
+// Hanya di sini halaman "Terima Kasih"
+// boleh ditampilkan setelah respon berhasil.
+
 document
 .getElementById('loading')
 .classList
@@ -1318,7 +1348,62 @@ alert(
 
 function resetForm(){
 
-location.reload();
+// Bersihkan tampilan sukses dan kembali ke form.
+// Tidak menyimpan status "Terima Kasih".
+
+document
+.getElementById('afterDone')
+.classList
+.add('hidden');
+
+document
+.getElementById('formPage')
+.classList
+.remove('hidden');
+
+
+// Reset seluruh input
+document
+.querySelectorAll('input, textarea, select')
+.forEach(el=>{
+
+if(el.type === 'file'){
+el.value='';
+}else{
+el.value='';
+}
+
+});
+
+
+// Reset tanda tangan
+if(pad){
+pad.clear();
+}
+
+
+// Reset syarat
+reqBox.innerHTML='';
+reqBox.classList.add('hidden');
+
+
+// Reset autocomplete
+acBox.innerHTML='';
+acBox.classList.add('hidden');
+
+
+// Sembunyikan bagian TTD
+document
+.getElementById('ttdSection')
+.classList
+.add('hidden');
+
+
+// Kembali ke atas
+window.scrollTo({
+top:0,
+behavior:'smooth'
+});
 
 }
 
@@ -1338,8 +1423,8 @@ return String(value || '')
 
 }
 
+
 </script>
 
 </body>
 </html>
-```
